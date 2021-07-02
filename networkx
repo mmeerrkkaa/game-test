@@ -1,0 +1,131 @@
+from random import randint
+import networkx as nx
+import matplotlib.pyplot as plt
+
+G = nx.Graph()
+
+
+SIZE = 10
+
+mapss = []
+
+[mapss.append(["#"] * SIZE) for i in range(SIZE)]
+
+
+class Player:
+	def __init__(self):
+		self.maps = mapss.copy()
+		self.coord = [[int(len(self.maps)//2), int(len(self.maps)**2%2)]]
+		self.coord.append([])
+		self.score = 0
+		Player.spawnfood(self)
+
+
+	def spawnfood(self):
+
+		while 1:
+			x = randint(0, SIZE-1)
+			y = randint(0, SIZE-1)
+			if x != self.coord[0][0] and y != self.coord[0][1]:
+				self.coord[1] = x,y
+
+				break
+
+	def isFood(self):
+		if self.coord[1][0] == self.coord[0][0] and self.coord[1][1] == self.coord[0][1]:
+			self.score += 1
+			print(self.score)
+			Player.spawnfood(self)
+
+
+	def up(self):
+		if self.coord[0][0] != 0:
+			self.coord[0][0] -= 1
+		else:
+			print("Невозможный ход")
+
+	def down(self):
+		if self.coord[0][0] != SIZE-1:
+			self.coord[0][0] += 1
+		else:
+			print("Невозможный ход")
+
+	def left(self):
+		if self.coord[0][1] != 0:
+			self.coord[0][1] -= 1
+		else:
+			print("Невозможный ход")
+
+	def right(self):
+		if self.coord[0][1] != SIZE-1:
+			self.coord[0][1] += 1
+		else:
+			print("Невозможный ход")
+
+	def updatemap(self):
+		self.maps = []
+		[self.maps.append(["#"] * SIZE) for i in range(SIZE)]
+
+		G = nx.grid_2d_graph(SIZE,SIZE)
+		print("Ходов до еды: ", end = "")
+		print(len(nx.bidirectional_shortest_path(G, source=(self.coord[0][0], (self.coord[0][1])), target=(self.coord[1][0], (self.coord[1][0])))) - 1)
+
+		self.maps[self.coord[1][0]][self.coord[1][1]] = "F"
+		self.maps[self.coord[0][0]][self.coord[0][1]] = "P"
+
+	def printmap(self):
+		Player.isFood(self)
+		Player.updatemap(self)
+		for i in self.maps:
+			print(*i)
+		print()
+
+
+	def menu(self):
+		while 1:
+			a = int(input())
+
+			if a == 1:
+				player.up()
+			elif a == 2:
+				player.down()
+			elif a == 3:
+				player.left()
+			else:
+				player.right()
+
+			player.printmap()
+
+player = Player()
+player.printmap()
+player.menu()
+
+
+"""
+
+print(mapss)
+for i in mapss:
+	print(*i)
+
+G = nx.grid_2d_graph(SIZE,SIZE)
+
+G.remove_node((0,1))
+
+pos = {(x,y):(y,-x) for x,y in G.nodes()}
+
+
+
+print(pos)
+plt.figure(figsize=(6,6))
+nx.draw(G, pos=pos,
+        node_color='lightgreen',
+        with_labels=True,
+        node_size=600)
+
+
+plt.show()
+
+coor1 = (0, 0) # seen as 2 in the arr array
+coor2 = (0, 2) # seen as 7 in the arr array
+
+print(nx.bidirectional_shortest_path(G, source=coor1, target=coor2))"""
